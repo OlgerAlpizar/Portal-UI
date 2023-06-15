@@ -1,0 +1,11 @@
+@use '../app/app.module' as globalStyle;
+
+.footer {
+  width: 100%;
+  display: flex;
+  border-top: 1px globalStyle.$primary-color solid;
+  padding: 1vh 3vw;
+}
+.footer p {
+  margin: 0;
+}
