@@ -1,12 +1,14 @@
 import { FC } from 'react'
-import { Col, Row } from 'react-bootstrap'
+import { Col, Container, Row } from 'react-bootstrap'
 import coffeeCup from '../../../assets/images/coffee_cup.png'
 import style from './Logo.module.scss'
 import cx from 'classnames'
+import Footer from '../footer/Footer'
 
 const Logo: FC = () => {
   return (
-    <Row>
+    <Container>
+      <Row>
       <Col>
         <img
           src={coffeeCup}
@@ -16,6 +18,13 @@ const Logo: FC = () => {
         <label className={cx(style.titleUrl)}>Cafeteria.com</label>
       </Col>
     </Row>
+
+    <Row>
+      <Col>
+      <Footer/>
+      </Col>
+    </Row>
+    </Container>
   )
 }
 

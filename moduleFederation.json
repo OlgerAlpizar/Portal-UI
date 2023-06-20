@@ -1,0 +1,5 @@
+{
+  "login": {
+    "development" : "https://localhost:3001/remoteEntry.js"
+  }
+}

@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, createContext, useEffect, useState } from "react"
+import { Dispatch, FC, SetStateAction, createContext, useEffect, useState } from 'react'
 
 type AppCustomContextProps = {
   date: string,
@@ -13,7 +13,7 @@ type AppCustomContextPropsProviderProps = {
 
 export const AppCustomContext = createContext<AppCustomContextProps | null>(null)
 
-const AppCustomContextPropsProvider: FC<AppCustomContextPropsProviderProps> = (props: AppCustomContextPropsProviderProps) => {
+const AppCustomContextProvider: FC<AppCustomContextPropsProviderProps> = (props: AppCustomContextPropsProviderProps) => {
 
   const [date, setDate] = useState('Default Date')
   const [location, setLocation] = useState('')
@@ -27,8 +27,9 @@ const AppCustomContextPropsProvider: FC<AppCustomContextPropsProviderProps> = (p
     setLocation(`Latitude: ${position.coords.latitude}, Longitude: ${position.coords.longitude}`);
   }
   
-  const error = (err: any) => {
-    console.log("Unable to retrieve your location", err);
+  const error = (err: GeolocationPositionError) => {
+    // eslint-disable-next-line no-console
+    console.log('Unable to retrieve your location', err);
   }
 
   return (
@@ -43,4 +44,4 @@ const AppCustomContextPropsProvider: FC<AppCustomContextPropsProviderProps> = (p
   )
 }
 
-export default AppCustomContextPropsProvider
+export default AppCustomContextProvider

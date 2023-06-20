@@ -1,5 +1,5 @@
 import { FC, useContext } from "react";
-import { AppCustomContext } from "../AppCustomContext";
+import { AppCustomContext } from "../../contexts/AppCustomContext";
 import cx from 'classnames'
 import style from './Footer.module.scss'
 
