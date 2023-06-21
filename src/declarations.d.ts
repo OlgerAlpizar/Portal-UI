@@ -10,7 +10,13 @@ declare module '*.png' {
   export default src
 }
 
-declare module 'login/LoginRemote' {
-  const LoginRemote: React.ComponentType
-  export default LoginRemote
+declare module 'authentication/AuthenticationRemote' {
+  const AuthenticationRemote: React.ComponentType
+  export default AuthenticationRemote
 }
+
+declare module 'user_management/UserManagementRemote' {
+  const UserManagementRemote: React.ComponentType
+  export default UserManagementRemote
+}
+

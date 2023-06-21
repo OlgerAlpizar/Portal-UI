@@ -8,8 +8,7 @@ import dotenv from 'dotenv'
 import { container } from 'webpack'
 import Config from './src/configuration/config'
 import remotes from './moduleFederation.json'
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const deps = require('./package.json').dependencies;
+import { dependencies } from './package.json'
 
 dotenv.config();
 
@@ -37,7 +36,7 @@ module.exports = {
     static: {
       directory: path.join(__dirname, 'dist'),
     },
-    port: process.env.PORT,
+    port: Config.port(),
     //open: true,
     historyApiFallback: true,
   },
@@ -78,18 +77,19 @@ module.exports = {
       name: 'portal',
       filename: 'remoteEntry.js',
       remotes: {
-        login: `login@${remotes['login'][env as keyof object]}`
+        authentication: `authentication@${remotes['authentication'][env as keyof object]}`,
+        user_management: `user_management@${remotes['user_management'][env as keyof object]}`
       },
       shared: {
-        ...deps,
-        react: { singleton: true, requiredVersion: deps.react },
+        ...dependencies,
+        react: { singleton: true, requiredVersion: dependencies.react },
         'react-dom': {
           singleton: true,
-          requiredVersion: deps['react-dom'],
+          requiredVersion: dependencies['react-dom'],
         },
         'react-router-dom': {
           singleton: true,
-          requiredVersion: deps['react-router-dom'],
+          requiredVersion: dependencies['react-router-dom'],
         }
       },
     })
