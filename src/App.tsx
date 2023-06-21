@@ -1,10 +1,10 @@
-import { FC, Suspense } from 'react';
-import AppCustomContextProvider from './contexts/AppCustomContext';
-import Footer from './components/footer/Footer';
-import { Container, Row, Col } from 'react-bootstrap';
-import { Route, Routes } from 'react-router-dom';
-import AuthenticationRemote from 'authentication/AuthenticationRemote';
-import UserManagementRemote from 'user_management/UserManagementRemote';
+import { Col, Container, Row } from 'react-bootstrap'
+import { FC, Suspense } from 'react'
+import { Route, Routes } from 'react-router-dom'
+import AppCustomContextProvider from './contexts/AppCustomContext'
+import AuthenticationRemote from 'authentication/AuthenticationRemote'
+import Footer from './components/footer/Footer'
+import UserManagementRemote from 'user_management/UserManagementRemote'
 
 const App: FC = () => {
   return (
@@ -15,7 +15,6 @@ const App: FC = () => {
         </Row>
 
         <Row>
-
           <Routes>
             <Route
               path="/authentication"
@@ -46,4 +45,4 @@ const App: FC = () => {
   )
 }
 
-export default App;
+export default App

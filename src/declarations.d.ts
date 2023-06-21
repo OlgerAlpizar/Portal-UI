@@ -19,4 +19,3 @@ declare module 'user_management/UserManagementRemote' {
   const UserManagementRemote: React.ComponentType
   export default UserManagementRemote
 }
-
