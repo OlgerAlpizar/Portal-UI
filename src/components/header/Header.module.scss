@@ -1,0 +1,17 @@
+@use '../../app.module' as globalStyle;
+
+.singIn {
+  text-decoration: none;
+}
+
+.imageBrand {
+  height: 120px;
+  margin: -30px 0px;
+  margin-left: 20px;
+}
+
+.navItem {
+  color: black;
+  font-weight: 600;
+  text-decoration: none;
+}
