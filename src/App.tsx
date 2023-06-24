@@ -1,16 +1,30 @@
 import { BrowserRouter } from 'react-router-dom'
 import { Col, Container, Row } from 'react-bootstrap'
-import { FC, Suspense } from 'react'
+import { FC, Suspense, useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
+import { ToastContainer, toast } from 'react-toastify'
 import AppCustomContextProvider from './contexts/AppCustomContext'
-import AuthenticationRemote from 'authentication/AuthenticationRemote'
 import Footer from './components/footer/Footer'
 import Header from './components/header/Header'
 import Home from './components/home/Home'
-import UserManagementRemote from 'user_management/UserManagementRemote'
+import PubSub from 'pubsub-js';
+import PubSubTopic from './models/PubSubTopic'
+import React from 'react'
 import style from './app.module.scss'
 
+const AuthenticationRemote = React.lazy(() => import('authentication/AuthenticationRemote'))
+const UserManagementRemote = React.lazy(() => import('user_management/UserManagementRemote'))
+
 const App: FC = () => {
+  useEffect(() => {
+    PubSub.subscribe(PubSubTopic[PubSubTopic.SIGN_IN], subscribeMethod)
+  }, [])
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const subscribeMethod = (topic: string, data: any) => {
+    toast.success(`Intercept ${topic} for the user: ${data.email}`)
+  }
+
   return (
     <AppCustomContextProvider>
       <BrowserRouter>
@@ -21,16 +35,16 @@ const App: FC = () => {
 
           <Row className={style.rowBody}>
             <Routes>
-              <Route 
-              index
-              element={
-                <Home/>
-              }
+              <Route
+                index
+                element={
+                  <Home />
+                }
               />
               <Route
                 path="/authentication/*"
                 element={
-                  <Suspense>
+                  <Suspense fallback='Loading authentication'>
                     <AuthenticationRemote />
                   </Suspense>
                 }
@@ -38,7 +52,7 @@ const App: FC = () => {
               <Route
                 path="/user/*"
                 element={
-                  <Suspense>
+                  <Suspense fallback='Loading user'>
                     <UserManagementRemote />
                   </Suspense>
                 }
@@ -53,6 +67,13 @@ const App: FC = () => {
           </Row>
         </Container>
       </BrowserRouter>
+      <ToastContainer
+        autoClose={5000}
+        position={toast.POSITION.BOTTOM_RIGHT}
+        pauseOnFocusLoss={false}
+        newestOnTop={true}
+        limit={5}
+      />
     </AppCustomContextProvider>
   )
 }
