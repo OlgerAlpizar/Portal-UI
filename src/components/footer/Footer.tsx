@@ -1,11 +1,8 @@
-import { AppCustomContext } from '../../contexts/AppCustomContext'
-import { FC, useContext } from 'react'
+import { FC } from 'react'
 import cx from 'classnames'
 import style from './Footer.module.scss'
 
 const Footer: FC = () => {
-  const ctx = useContext(AppCustomContext)
-
   return (
     <footer
       className={cx(
@@ -15,9 +12,6 @@ const Footer: FC = () => {
     >
       <p className="justify-content-start">
         &copy; 2023 Olger Alpizar Chaves, Inc
-      </p>
-      <p className="justify-content-end">
-        {ctx?.location} {ctx?.date}
       </p>
     </footer>
   )
