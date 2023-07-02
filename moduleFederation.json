@@ -1,7 +1,4 @@
 {
-  "authentication": {
-    "development": "https://localhost:3001/remoteEntry.js"
-  },
   "user_management": {
     "development": "https://localhost:3002/remoteEntry.js"
   }

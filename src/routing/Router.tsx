@@ -2,11 +2,13 @@
 import { AppLayout } from '../App';
 import { FC, Suspense, lazy } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom';
+import ForgotPassword from '../components/forgotPassword/ForgotPassword';
 import Home from '../components/home/Home'
-import Loading from '../shared/components/Loading';
+import Loading from '../shared/components/loading/Loading';
 import PrivateRoute from './PrivateRoute';
+import SignIn from '../components/signIn/SignIn';
+import SignUp from '../components/signUp/SignUp';
 
-const AuthenticationRemote = lazy(() => import('authentication/AuthenticationRemote'))
 const UserManagementRemote = lazy(() => import('user_management/UserManagementRemote'))
 
 const Router: FC = () => {
@@ -16,17 +18,19 @@ const Router: FC = () => {
       <Route path='/' element={<AppLayout />}>
         <Route
           index
-          element={
-            <Home />
-          }
+          element={ <Home /> }
         />
         <Route
-          path="auth/*"
-          element={
-            <Suspense fallback={<Loading moduleName={'Loading authentication component'} />}>
-              <AuthenticationRemote />
-            </Suspense>
-          }
+          path="sign-in"
+          element={ <SignIn /> }
+        />
+        <Route
+          path="sign-up"
+          element={ <SignUp /> }
+        />
+        <Route
+          path="forgot-password"
+          element={ <ForgotPassword /> }
         />
         <Route
           path="user/*"

@@ -1,12 +1,9 @@
 import {
   FC,
-  useEffect,
   useState
 } from 'react'
 import { PortalContext } from './PortalContext'
-import { toast } from 'react-toastify'
-import PubSub from 'pubsub-js'
-import PubSubTopic from '../models/PubSubTopic'
+import { useIsAuthenticated } from 'react-auth-kit'
 
 type PortalContextProviderProps = {
   children: React.ReactNode
@@ -15,19 +12,9 @@ type PortalContextProviderProps = {
 const PortalContextProvider: FC<PortalContextProviderProps> = (
   props: PortalContextProviderProps
 ) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(useIsAuthenticated())
   const [userEmail, setUserEmail] = useState('')
   const [userAvatar, setUserAvatar] = useState('')
-
-  useEffect(() => {
-    PubSub.subscribe(PubSubTopic[PubSubTopic.SIGN_IN], subscribeMethod)
-  }, [])
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const subscribeMethod = (topic: string, data: any) => {
-    toast.success(`Intercept ${topic} for the user: ${data.email}`)
-    setIsAuthenticated(true)
-  }
 
   return (
     <PortalContext.Provider

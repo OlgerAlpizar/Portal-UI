@@ -7,29 +7,33 @@ import { ToastContainer, toast } from 'react-toastify'
 import App from './App'
 import PortalContextProvider from './contexts/PortalContextProvider'
 import ReactDOM from 'react-dom/client'
+import React from 'react'
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
-root.render (
-  <AuthProvider
-    authType={'cookie'}
-    authName={'_auth'}
-    cookieDomain={window.location.hostname}
-    cookieSecure={window.location.protocol === 'https:'}
-  >
-    <PortalContextProvider>
-      <BrowserRouter>
+root.render(
+  <React.StrictMode>
 
-        <App />
-        
-        <ToastContainer
-          autoClose={5000}
-          position={toast.POSITION.BOTTOM_RIGHT}
-          pauseOnFocusLoss={false}
-          newestOnTop={true}
-          limit={5}
-        />
+    <AuthProvider
+      authType={'cookie'}
+      authName={'_auth'}
+      cookieDomain={window.location.hostname}
+      cookieSecure={window.location.protocol === 'https:'}
+    >
+      <PortalContextProvider>
+        <BrowserRouter>
 
-      </BrowserRouter>
-    </PortalContextProvider>
-  </AuthProvider>
+          <App />
+
+          <ToastContainer
+            autoClose={5000}
+            position={toast.POSITION.BOTTOM_RIGHT}
+            pauseOnFocusLoss={false}
+            newestOnTop={true}
+            limit={5}
+          />
+
+        </BrowserRouter>
+      </PortalContextProvider>
+    </AuthProvider>
+  </React.StrictMode>
 )

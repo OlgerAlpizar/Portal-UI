@@ -1,7 +1,7 @@
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import { container } from 'webpack'
 import { dependencies } from './package.json'
-import Config from './src/configuration/config'
+import Config from './src/configurations/config'
 import EsLintPlugin from 'eslint-webpack-plugin'
 import HtmlWebPackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
@@ -22,6 +22,7 @@ module.exports = {
     filename: '[name].[contenthash].bundle.js',
     uniqueName: 'portal',
     clean: true,
+    
     asyncChunks: true,
   },
   resolve: {
@@ -77,9 +78,6 @@ module.exports = {
       name: 'portal',
       filename: 'remoteEntry.js',
       remotes: {
-        authentication: `authentication@${
-          remotes['authentication'][env as keyof object]
-        }`,
         user_management: `user_management@${
           remotes['user_management'][env as keyof object]
         }`,

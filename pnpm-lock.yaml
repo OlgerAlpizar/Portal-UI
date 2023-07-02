@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@types/js-cookie':
+    specifier: ^3.0.3
+    version: 3.0.3
   axios:
     specifier: ^1.4.0
     version: 1.4.0
@@ -14,6 +17,9 @@ dependencies:
   classnames:
     specifier: ^2.3.2
     version: 2.3.2
+  js-cookie:
+    specifier: ^3.0.5
+    version: 3.0.5
   pubsub-js:
     specifier: ^1.9.4
     version: 1.9.4
@@ -803,6 +809,10 @@ packages:
     dependencies:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
+
+  /@types/js-cookie@3.0.3:
+    resolution: {integrity: sha512-Xe7IImK09HP1sv2M/aI+48a20VX+TdRJucfq4vfRVy6nWN8PYPOEnlMRSgxJAgYQIXJVL8dZ4/ilAM7dWNaOww==}
+    dev: false
 
   /@types/json-schema@7.0.12:
     resolution: {integrity: sha512-Hr5Jfhc9eYOQNPYO5WLDq/n4jqijdHNlDXjuAQkkt+mWdQR+XJToOHrsD4cPaMXpn6KO7y2+wM8AZEs8VpBLVA==}
