@@ -1,56 +1,65 @@
-import { axiosTextHeader } from '../shared/utils/AuthUserHelper'
-import AuthResponse from '../models/responses/AuthResponse'
-import Config from '../configurations/config'
-import Cookies from 'js-cookie';
-import CreateAccount from '../models/requests/CreateAccountRequest'
-import SignInRequest from '../models/requests/SignInRequest'
-import SocialLink from '../models/SocialLink'
-import axios from 'axios'
+import { AxiosInstance } from 'axios'
+import AuthResponse from './responses/AuthResponse'
+import CreateAccount from './requests/CreateAccountRequest'
+import SignInRequest from './requests/SignInRequest'
+import SocialLink from '../models/SocialNetwork'
 
-
-const authApi = axios.create({
-  baseURL: Config.authenticationApi(),
-  headers: axiosTextHeader()
-})
-
-authApi.interceptors.request.use(
-  (requestConfig) => {
-    const authToken = Cookies.get('_auth')
-    requestConfig.headers['Authentication'] = authToken ? authToken : ''
-    return requestConfig;
-  }
-)
-
-export const onLoginSocialLink = async (link: SocialLink): Promise<unknown> => {
-  throw `Social login not implemented yet ${link}`
-}
-
-export const onRegisterSocialLink = async (
+export const signInPassport = async (
+  api: AxiosInstance,
   link: SocialLink
 ): Promise<unknown> => {
-  throw `Social register not implemented yet ${link}`
+  throw `Social login not implemented yet ${link}. ${api.toString()}`
 }
 
-export const onBasicLogin = async (
+export const signUpPassport = async (
+  api: AxiosInstance,
+  link: SocialLink
+): Promise<unknown> => {
+  throw `Social register not implemented yet ${link}. ${api.toString()}`
+}
+
+export const signIn = async (
+  api: AxiosInstance,
   request: SignInRequest
 ): Promise<AuthResponse> => {
-  return authApi.post('/sign-in', request)
-    .then((res) => res.data)
+  return api.post('/sign-in', request).then((res) => res.data)
 }
 
-export const onBasicRegister = async (
+export const signUp = async (
+  api: AxiosInstance,
   request: CreateAccount
 ): Promise<AuthResponse> => {
-  return authApi.post('/sign-up', request)
+  return api.post('/sign-up', request).then((res) => res.data)
+}
+
+export const resetPassword = async (
+  api: AxiosInstance,
+  request: string
+): Promise<unknown> => {
+  return api
+    .post(
+      '/forgot-password',
+      { email: request }
+    )
     .then((res) => res.data)
 }
 
-export const onForgotPassword = async (request: string): Promise<unknown> => {
-  return authApi.post(
-    '/forgot-password',
-    request,
-    {
-      withCredentials: true
-    })
+export const signOut = async (
+  api: AxiosInstance,
+  request: string
+): Promise<AuthResponse> => {
+  return api
+    .post(
+      '/sign-out',
+      { email: request }
+    )
+    .then((res) => res.data)
+}
+
+export const authVerification = async (
+  api: AxiosInstance
+): Promise<AuthResponse> => {
+  return api
+    .post('/check-auth')
     .then((res) => res.data)
 }

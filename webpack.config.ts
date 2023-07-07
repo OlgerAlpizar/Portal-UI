@@ -1,7 +1,7 @@
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import { analyzerPort, environment, port } from './src/configurations/settings'
 import { container } from 'webpack'
 import { dependencies } from './package.json'
-import Config from './src/configurations/config'
 import EsLintPlugin from 'eslint-webpack-plugin'
 import HtmlWebPackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
@@ -12,7 +12,7 @@ import webpack from 'webpack'
 
 dotenv.config()
 
-const env = Config.env()
+const env = environment()
 
 module.exports = {
   mode: env,
@@ -22,7 +22,7 @@ module.exports = {
     filename: '[name].[contenthash].bundle.js',
     uniqueName: 'portal',
     clean: true,
-    
+
     asyncChunks: true,
   },
   resolve: {
@@ -37,7 +37,7 @@ module.exports = {
     static: {
       directory: path.join(__dirname, 'dist'),
     },
-    port: Config.port(),
+    port: port(),
     //open: true,
     historyApiFallback: true,
   },
@@ -65,7 +65,7 @@ module.exports = {
     new EsLintPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new BundleAnalyzerPlugin({
-      analyzerPort: Config.analyzerPort(),
+      analyzerPort: analyzerPort(),
       openAnalyzer: false,
     }),
     new HtmlWebPackPlugin({

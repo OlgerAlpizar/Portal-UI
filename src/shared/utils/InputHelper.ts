@@ -1,15 +1,15 @@
-import { InputInfo, InputInfoSet } from '../../models/InputInfo'
+import InputState from '../../models/InputState'
 
 export const textInputReducer = (
-  currentState: InputInfo,
-  action: InputInfoSet,
+  currentState: InputState,
+  value: string,
   isValid: boolean,
   errorNote: string
 ) => {
   return {
     ...currentState,
     valid: isValid,
-    value: action.value,
+    value: value,
     error: isValid ? '' : errorNote,
   }
 }

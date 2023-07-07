@@ -9,91 +9,85 @@ import {
   PopoverBody,
   Row,
 } from 'react-bootstrap'
-import { FC, SyntheticEvent, useReducer, useState } from 'react'
-import { InputInfo, InputInfoSet } from '../../models/InputInfo'
+import { FC, SyntheticEvent, useContext, useReducer, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { buildApiCatchMessage } from '../../shared/utils/buildApiCatchMessage'
-import { buildUserCookieInfo } from '../../shared/utils/AuthUserHelper'
+import { authenticationApi } from '../../configurations/settings'
 import {
   conformPasswordValidator,
   emailValidator,
   noEmptyOrSpecialValidator,
   passwordValidator,
-} from '../../shared/utils/RegexValidator'
-import { onBasicRegister } from '../../apis/AuthenticationService'
-import { textInputReducer } from '../../shared/utils/InputReducer'
+} from '../../shared/utils/TextHelper'
+import { parseCatchMessage } from '../../shared/utils/MessageHelper'
+import { signUp } from '../../apis/AuthenticationService'
+import { textInputReducer } from '../../shared/utils/InputHelper'
 import { toast } from 'react-toastify'
-import { useSignIn } from 'react-auth-kit'
-import AuthResponse from '../../models/responses/AuthResponse'
-import CreateAccountRequest from '../../models/requests/CreateAccountRequest'
+import { useAxiosInstance } from '../../shared/hooks/AxiosHook'
+import AuthResponse from '../../apis/responses/AuthResponse'
+import CreateAccountRequest from '../../apis/requests/CreateAccountRequest'
 import FormSocialManager from '../socialLinks/SocialLinks'
-import PubSub from 'pubsub-js'
-import PubSubTopic from '../../models/PubSubTopic'
-import SocialEvent from '../../models/SocialEvent'
+import InputState from '../../models/InputState'
+import SecurityContext from '../../contexts/SecurityContext'
+import SocialNetworkEvent from '../../models/SocialNetworkEvent'
 import SubmitButton from '../../shared/components/submitButton/SubmitButton'
 import TermsConditions from '../termsConditions/TermsConditions'
 
 const SignUp: FC = () => {
-  const signIn = useSignIn()
+  const ctx = useContext(SecurityContext)
+  const authApiInstance = useAxiosInstance(authenticationApi())
 
-  const emailReducer = (currentState: InputInfo, action: InputInfoSet) => {
+  const emailReducer = (currentState: InputState, value: string) => {
     return textInputReducer(
       currentState,
-      action,
-      emailValidator(action.value),
+      value,
+      emailValidator(value),
       'Your email address is invalid. Please check!'
     )
   }
 
-  const passwordReducer = (currentState: InputInfo, action: InputInfoSet) => {
+  const passwordReducer = (currentState: InputState, value: string) => {
     return textInputReducer(
       currentState,
-      action,
-      passwordValidator(action.value),
+      value,
+      passwordValidator(value),
       'Your password is invalid. Please check! (should be at least 8 characters)'
     )
   }
 
-  const conformPasswordReducer = (
-    currentState: InputInfo,
-    action: InputInfoSet
-  ) => {
+  const conformPasswordReducer = (currentState: InputState, value: string) => {
     return textInputReducer(
       currentState,
-      action,
-      conformPasswordValidator(action.value, password.value),
+      value,
+      conformPasswordValidator(value, password.value),
       'Your password does not match'
     )
   }
 
-  const regularStringReducer = (
-    currentState: InputInfo,
-    action: InputInfoSet
-  ) => {
+  const regularStringReducer = (currentState: InputState, value: string) => {
     return textInputReducer(
       currentState,
-      action,
-      noEmptyOrSpecialValidator(action.value),
+      value,
+      noEmptyOrSpecialValidator(value),
       'Invalid value (Avoid special characters)'
     )
   }
 
-  const [email, dispatchEmail] = useReducer(emailReducer, new InputInfo())
+  const [email, dispatchEmail] = useReducer(emailReducer, new InputState())
   const [password, dispatchPassword] = useReducer(
     passwordReducer,
-    new InputInfo()
+    new InputState()
   )
   const [confirmPassword, dispatchConfirmPassword] = useReducer(
     conformPasswordReducer,
-    new InputInfo()
+    new InputState()
   )
   const [firstName, dispatchFirstName] = useReducer(
     regularStringReducer,
-    new InputInfo()
+    new InputState()
   )
   const [lastName, dispatchLastName] = useReducer(
     regularStringReducer,
-    new InputInfo()
+    new InputState()
   )
   const [agreement, setAgreement] = useState(false)
   const [allowNotifications, setAllowNotifications] = useState(true)
@@ -102,7 +96,6 @@ const SignUp: FC = () => {
 
   const onSubmit = (event: SyntheticEvent) => {
     event.preventDefault()
-
     setSubmitting(true)
 
     const request = new CreateAccountRequest(
@@ -113,19 +106,11 @@ const SignUp: FC = () => {
       allowNotifications
     )
 
-    onBasicRegister(request)
+    signUp(authApiInstance, request)
       .then((res: AuthResponse) => {
-        toast.success('The account has been created')
-        signIn({
-          token: res.token,
-          expiresIn: res.expiresIn,
-          tokenType: 'Bearer',
-          authState: { user:  buildUserCookieInfo(res)}
-        })
-
-        PubSub.publish(PubSubTopic[PubSubTopic.SIGN_UP], email)
+        ctx?.onBasicAuth(res, 'The account has been created', '/')
       })
-      .catch((err: Error) => toast.error(buildApiCatchMessage(err)))
+      .catch((err: Error) => toast.error(parseCatchMessage(err)))
       .finally(() => setSubmitting(false))
   }
 
@@ -172,9 +157,7 @@ const SignUp: FC = () => {
         >
           Create account
         </Col>
-        <Col
-          className="float-end"
-        >
+        <Col className="float-end">
           <Link
             to={'/sign-in'}
             className={'primaryIconBtn'}
@@ -197,10 +180,8 @@ const SignUp: FC = () => {
                 type={'text'}
                 value={firstName.value}
                 placeholder={'First name'}
-                onChange={(e) =>
-                  dispatchFirstName({ value: e.target.value as string })
-                }
-                onBlur={() => dispatchFirstName({ value: firstName.value })}
+                onChange={(e) => dispatchFirstName(e.target.value as string)}
+                onBlur={() => dispatchFirstName(firstName.value)}
                 required
                 isInvalid={!firstName.valid}
                 autoComplete="off"
@@ -220,10 +201,8 @@ const SignUp: FC = () => {
                 type={'text'}
                 value={lastName.value}
                 placeholder={'Last name'}
-                onChange={(e) =>
-                  dispatchLastName({ value: e.target.value as string })
-                }
-                onBlur={() => dispatchLastName({ value: lastName.value })}
+                onChange={(e) => dispatchLastName(e.target.value as string)}
+                onBlur={() => dispatchLastName(lastName.value)}
                 required
                 isInvalid={!lastName.valid}
                 autoComplete="off"
@@ -248,10 +227,8 @@ const SignUp: FC = () => {
                 type={'email'}
                 value={email.value}
                 placeholder={'your@email.com'}
-                onChange={(e) =>
-                  dispatchEmail({ value: e.target.value as string })
-                }
-                onBlur={() => dispatchEmail({ value: email.value })}
+                onChange={(e) => dispatchEmail(e.target.value as string)}
+                onBlur={() => dispatchEmail(email.value)}
                 required
                 isInvalid={!email.valid}
                 autoComplete="off"
@@ -276,10 +253,8 @@ const SignUp: FC = () => {
                 type={'password'}
                 value={password.value}
                 placeholder={'**********'}
-                onChange={(e) =>
-                  dispatchPassword({ value: e.target.value as string })
-                }
-                onBlur={() => dispatchPassword({ value: password.value })}
+                onChange={(e) => dispatchPassword(e.target.value as string)}
+                onBlur={() => dispatchPassword(password.value)}
                 required
                 isInvalid={!password.valid}
                 autoComplete="off"
@@ -305,11 +280,9 @@ const SignUp: FC = () => {
                 value={confirmPassword.value}
                 placeholder={'**********'}
                 onChange={(e) =>
-                  dispatchConfirmPassword({ value: e.target.value as string })
+                  dispatchConfirmPassword(e.target.value as string)
                 }
-                onBlur={() =>
-                  dispatchConfirmPassword({ value: confirmPassword.value })
-                }
+                onBlur={() => dispatchConfirmPassword(confirmPassword.value)}
                 required
                 isInvalid={!confirmPassword.valid}
                 autoComplete="off"
@@ -387,7 +360,7 @@ const SignUp: FC = () => {
             as={Row}
             className={'mb-3 text-center'}
           >
-            <FormSocialManager socialEvent={SocialEvent.Register} />
+            <FormSocialManager socialEvent={SocialNetworkEvent.SIGN_UP} />
           </Form.Group>
         </Form>
         <TermsConditions

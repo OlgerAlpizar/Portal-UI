@@ -11,12 +11,22 @@ const Loading: FC<LoadingProps> = (props: LoadingProps) => {
   return (
     <Row>
       <Col>
-        <Modal show={true} centered contentClassName={style.modal} backdrop={true}>
+        <Modal
+          show={true}
+          centered
+          contentClassName={style.modal}
+          backdrop={true}
+        >
           <Modal.Body>
             <Container className={cx(style.container)}>
               <>
                 <p>{props.moduleName}</p>
-                <Spinner as="span" animation="grow" role="status" aria-hidden="true" />
+                <Spinner
+                  as="span"
+                  animation="grow"
+                  role="status"
+                  aria-hidden="true"
+                />
               </>
             </Container>
           </Modal.Body>

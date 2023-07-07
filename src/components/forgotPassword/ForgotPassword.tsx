@@ -1,35 +1,41 @@
 import { Card, Col, Form, Row } from 'react-bootstrap'
 import { FC, SyntheticEvent, useReducer, useState } from 'react'
-import { InputInfo, InputInfoSet } from '../../models/InputInfo'
 import { Link } from 'react-router-dom'
-import { buildApiCatchMessage } from '../../shared/utils/buildApiCatchMessage'
-import { emailValidator } from '../../shared/utils/RegexValidator'
-import { onForgotPassword } from '../../apis/AuthenticationService'
-import { textInputReducer } from '../../shared/utils/InputReducer'
+import { authenticationApi } from '../../configurations/settings'
+import { emailValidator } from '../../shared/utils/TextHelper'
+import { parseCatchMessage } from '../../shared/utils/MessageHelper'
+import { resetPassword } from '../../apis/AuthenticationService'
+import { textInputReducer } from '../../shared/utils/InputHelper'
 import { toast } from 'react-toastify'
+import { useAxiosInstance } from '../../shared/hooks/AxiosHook'
+import InputState from '../../models/InputState'
 import SubmitButton from '../../shared/components/submitButton/SubmitButton'
-import cx from 'classnames';
+import cx from 'classnames'
 
 const ForgotPassword: FC = () => {
-  const emailReducer = (currentState: InputInfo, action: InputInfoSet) => {
+  const authApiInstance = useAxiosInstance(authenticationApi())
+
+  const emailReducer = (currentState: InputState, value: string) => {
     return textInputReducer(
       currentState,
-      action,
-      emailValidator(action.value),
+      value,
+      emailValidator(value),
       'Your email address is invalid. Please check!'
     )
   }
-  
-  const [email, dispatchEmail] = useReducer(emailReducer, new InputInfo())
+
+  const [email, dispatchEmail] = useReducer(emailReducer, new InputState())
   const [submitting, setSubmitting] = useState(false)
-  
+
   const onSubmit = (event: SyntheticEvent) => {
     event.preventDefault()
     setSubmitting(true)
 
-    onForgotPassword(email.value)
-    .then(() => toast.success('We send you and email to restore your account'))
-    .catch((err: Error) => toast.error(buildApiCatchMessage(err)))    
+    resetPassword(authApiInstance, email.value)
+      .then(() =>
+        toast.success('We send you and email to restore your account')
+      )
+      .catch((err: Error) => toast.error(parseCatchMessage(err)))
   }
 
   return (
@@ -41,11 +47,9 @@ const ForgotPassword: FC = () => {
         >
           Forgot password
         </Col>
-        <Col
-          className="float-end"
-        >
+        <Col className="float-end">
           <Link
-            to={'/sign-in'}//MF will return to the shell, on module ill redirect to default route
+            to={'/sign-in'} //MF will return to the shell, on module ill redirect to default route
             className={'primaryIconBtn'}
           >
             &nbsp;Sign in
@@ -65,10 +69,8 @@ const ForgotPassword: FC = () => {
                 type={'email'}
                 value={email.value}
                 placeholder={'your@email.com'}
-                onChange={(e) =>
-                  dispatchEmail({ value: e.target.value as string })
-                }
-                onBlur={() => dispatchEmail({ value: email.value })}
+                onChange={(e) => dispatchEmail(e.target.value as string)}
+                onBlur={() => dispatchEmail(email.value)}
                 required
                 isInvalid={!email.valid}
                 autoComplete="off"

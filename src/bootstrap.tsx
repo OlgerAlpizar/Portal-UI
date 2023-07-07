@@ -3,37 +3,27 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'react-toastify/dist/ReactToastify.css'
 import { AuthProvider } from 'react-auth-kit'
 import { BrowserRouter } from 'react-router-dom'
-import { ToastContainer, toast } from 'react-toastify'
+import { SecurityContextProvider } from './contexts/SecurityContext'
 import App from './App'
-import PortalContextProvider from './contexts/PortalContextProvider'
-import ReactDOM from 'react-dom/client'
 import React from 'react'
+import ReactDOM from 'react-dom/client'
+import Toaster from './shared/components/toaster/Toaster'
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
-
     <AuthProvider
       authType={'cookie'}
       authName={'_auth'}
       cookieDomain={window.location.hostname}
       cookieSecure={window.location.protocol === 'https:'}
     >
-      <PortalContextProvider>
-        <BrowserRouter>
-
+      <BrowserRouter>
+        <SecurityContextProvider>
           <App />
-
-          <ToastContainer
-            autoClose={5000}
-            position={toast.POSITION.BOTTOM_RIGHT}
-            pauseOnFocusLoss={false}
-            newestOnTop={true}
-            limit={5}
-          />
-
-        </BrowserRouter>
-      </PortalContextProvider>
+          <Toaster />
+        </SecurityContextProvider>
+      </BrowserRouter>
     </AuthProvider>
   </React.StrictMode>
 )

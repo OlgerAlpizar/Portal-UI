@@ -1,49 +1,59 @@
-
-import { AppLayout } from '../App';
+import { AppLayout } from '../App'
 import { FC, Suspense, lazy } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom';
-import ForgotPassword from '../components/forgotPassword/ForgotPassword';
+import { Navigate, Route, Routes } from 'react-router-dom'
+import ForgotPassword from '../components/forgotPassword/ForgotPassword'
 import Home from '../components/home/Home'
-import Loading from '../shared/components/loading/Loading';
-import PrivateRoute from './PrivateRoute';
-import SignIn from '../components/signIn/SignIn';
-import SignUp from '../components/signUp/SignUp';
+import Loading from '../shared/components/loading/Loading'
+import PrivateRoute from './PrivateRoute'
+import SignIn from '../components/signIn/SignIn'
+import SignUp from '../components/signUp/SignUp'
 
-const UserManagementRemote = lazy(() => import('user_management/UserManagementRemote'))
+const UserManagementRemote = lazy(
+  () => import('user_management/UserManagementRemote')
+)
 
 const Router: FC = () => {
   return (
     <Routes>
-
-      <Route path='/' element={<AppLayout />}>
+      <Route
+        path="/"
+        element={<AppLayout />}
+      >
         <Route
           index
-          element={ <Home /> }
+          element={<Home />}
         />
         <Route
           path="sign-in"
-          element={ <SignIn /> }
+          element={<SignIn />}
         />
         <Route
           path="sign-up"
-          element={ <SignUp /> }
+          element={<SignUp />}
         />
         <Route
           path="forgot-password"
-          element={ <ForgotPassword /> }
+          element={<ForgotPassword />}
         />
         <Route
           path="user/*"
           element={
             <PrivateRoute>
-              <Suspense fallback={<Loading moduleName={'Loading user management component'} />}>
+              <Suspense
+                fallback={
+                  <Loading moduleName={'Loading user management component'} />
+                }
+              >
                 <UserManagementRemote />
               </Suspense>
             </PrivateRoute>
           }
         />
       </Route>
-      <Route path='*' element={<Navigate to='/' />} />
+      <Route
+        path="*"
+        element={<Navigate to="/" />}
+      />
     </Routes>
   )
 }

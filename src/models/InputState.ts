@@ -1,4 +1,4 @@
-export class InputInfo {
+class InputState {
   valid: boolean
   value: string
   error: string
@@ -10,6 +10,4 @@ export class InputInfo {
   }
 }
 
-export type InputInfoSet = {
-  value: string
-}
+export default InputState

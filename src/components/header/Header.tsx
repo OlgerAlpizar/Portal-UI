@@ -1,38 +1,50 @@
 import { AiOutlineUser } from 'react-icons/ai'
 import { Container, NavDropdown, Navbar } from 'react-bootstrap'
 import { FC, useContext } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { PortalContext } from '../../contexts/PortalContext'
-import { beginUpperCase } from '../../shared/utils/TextHelper'
-import { getUserAvatar } from '../../shared/utils/ImageHelper'
-import { useAuthUser, useSignOut } from 'react-auth-kit'
-import coffeeCup from '../../assets/images/coffee_cup.png'
+import { Link } from 'react-router-dom'
+import { authenticationApi } from '../../configurations/settings'
+import { getUserAvatar } from '../../shared/utils/UserHelper'
+import { parseCamelCase } from '../../shared/utils/TextHelper'
+import { parseCatchMessage } from '../../shared/utils/MessageHelper'
+import { signOut } from '../../apis/AuthenticationService'
+import { toast } from 'react-toastify'
+import { useAxiosInstance } from '../../shared/hooks/AxiosHook'
+import SecurityContext from '../../contexts/SecurityContext'
+import coffeeCup from '../../assets/coffee_cup.png'
 import cx from 'classnames'
 import style from './Header.module.scss'
 
 const Header: FC = () => {
-  const ctx = useContext(PortalContext)
-  const signOut = useSignOut()
-  const auth = useAuthUser()
-  const navigate = useNavigate()
-  const location = useLocation()
+  const ctx = useContext(SecurityContext)
+  const authApiInstance = useAxiosInstance(authenticationApi())
 
   const onSignOut = () => {
-    signOut()
-    ctx?.setIsAuthenticated(false)
-    navigate('/')
+    signOut(authApiInstance, ctx?.authenticator.currentUser?.email ?? '')
+      .then(() => ctx?.onBasicSignOut('/'))
+      .then(() => toast.success('sign out success'))
+      .catch((err: Error) => toast.error(parseCatchMessage(err)))
+  }
+
+  const getUser = () => {
+    return `${parseCamelCase(ctx?.authenticator.currentUser?.firstName)} 
+    ${parseCamelCase(ctx?.authenticator.currentUser?.lastName)}`
   }
 
   const loginNav = () => {
-    return ctx?.isAuthenticated ? (
+    return ctx?.authenticator.isAuthenticated ? (
       <>
-        <img src={getUserAvatar(auth()?.user.avatar)} className={cx('rounded-circle', style.avatar)} alt="account"></img>
-        <NavDropdown title={`${beginUpperCase(auth()?.user.firstName)} ${beginUpperCase(auth()?.user.lastName)}`} align="end">
+        <img
+          src={getUserAvatar(ctx?.authenticator.currentUser?.avatar)}
+          className={cx('rounded-circle', style.avatar)}
+          alt="account"
+        ></img>
+        <NavDropdown
+          title={getUser()}
+          align="end"
+        >
           <NavDropdown.Item href="#action/3.1">My account</NavDropdown.Item>
           <NavDropdown.Divider />
-          <NavDropdown.Item onClick={onSignOut}>
-            Sign Out
-          </NavDropdown.Item>
+          <NavDropdown.Item onClick={onSignOut}>Sign Out</NavDropdown.Item>
         </NavDropdown>
       </>
     ) : (
@@ -43,17 +55,24 @@ const Header: FC = () => {
         >
           <AiOutlineUser
             title="Sing in"
-            size={20} />&nbsp;Sing In
+            size={20}
+          />
+          &nbsp;Sing In
         </Link>
       )
     )
   }
 
   const restrictedNav = () => {
-    return ctx?.isAuthenticated ? (
+    return ctx?.authenticator.isAuthenticated ? (
       <Link
         to={'user'}
-        className={cx('primaryIconBtn', 'me-auto', 'my-2 my-lg-0', style.navItem)}
+        className={cx(
+          'primaryIconBtn',
+          'me-auto',
+          'my-2 my-lg-0',
+          style.navItem
+        )}
       >
         &nbsp;Users
       </Link>
@@ -64,11 +83,16 @@ const Header: FC = () => {
 
   return (
     <div>
-      <Navbar expand="lg" className={cx('bg-body-tertiary', style.headerContainer)}>
+      <Navbar
+        expand="lg"
+        className={cx('bg-body-tertiary', style.headerContainer)}
+      >
         <Container fluid>
-
           <Navbar.Brand>
-            <Link to={'/'} className={style.brand}>
+            <Link
+              to={'/'}
+              className={style.brand}
+            >
               <img
                 src={coffeeCup}
                 alt="Logo"
@@ -79,7 +103,10 @@ const Header: FC = () => {
 
           <Navbar.Toggle aria-controls="navbarScroll" />
 
-          <Navbar.Collapse id="navbarScroll" className="justify-content-end">
+          <Navbar.Collapse
+            id="navbarScroll"
+            className="justify-content-end"
+          >
             {restrictedNav()}
             {loginNav()}
           </Navbar.Collapse>
