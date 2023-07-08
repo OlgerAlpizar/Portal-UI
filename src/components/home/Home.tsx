@@ -1,12 +1,14 @@
 import { Button, Carousel, Col, Row } from 'react-bootstrap'
 import { FC, useContext } from 'react'
-import { authVerification } from '../../apis/AuthenticationService'
+import { authVerification, signIn, signOut } from '../../apis/AuthenticationService'
 import { authenticationApi } from '../../configurations/settings'
 import { parseCatchMessage } from '../../shared/utils/MessageHelper'
 import { toast } from 'react-toastify'
 import { useAxiosInstance } from '../../shared/hooks/AxiosHook'
 import SecurityContext from '../../contexts/SecurityContext'
 import style from './Home.module.scss'
+import AuthResponse from '../../apis/responses/AuthResponse'
+import SignInRequest from '../../apis/requests/SignInRequest'
 
 const news = [
   {
@@ -33,6 +35,23 @@ const Home: FC = () => {
   const ctx = useContext(SecurityContext)
   const authApiInstance = useAxiosInstance(authenticationApi())
 
+  const onSignIn = () => {
+    const request = new SignInRequest('olger@mail.com', '123asdAS!@', false)
+    
+    signIn(authApiInstance, request)
+    .then((res: AuthResponse) => {
+      ctx?.onBasicAuth(res, 'Sign in completed', '/')
+    })
+    .catch((err: Error) => toast.error(parseCatchMessage(err)))
+  }
+
+  const onSignOut = () => {
+    signOut(authApiInstance, ctx?.authenticator.currentUser?.email ?? '')
+      .then(() => ctx?.onBasicSignOut('/'))
+      .then(() => toast.success('sign out success'))
+      .catch((err: Error) => toast.error(parseCatchMessage(err)))    
+  }
+
   const onAuthVerification = () => {
     authVerification(authApiInstance)
       .then(() =>
@@ -41,9 +60,7 @@ const Home: FC = () => {
         )
       )
       .catch((err) => {
-        // eslint-disable-next-line no-console
-        console.log(`No user authenticated. ${parseCatchMessage(err)}`)
-        toast.error('No user authenticated')
+        toast.error(`No user authenticated. ${parseCatchMessage(err)}`)
       })
   }
 
@@ -51,7 +68,19 @@ const Home: FC = () => {
     <div>
       <Row>
         <Col>
+          <Button onClick={onSignIn} className='primaryBtn float-end'>Sign In</Button>
+        </Col>
+        <Col>
+          <Button onClick={onSignOut} className='primaryBtn float-end'>Sign out</Button>
+        </Col>
+        <Col>
           <Button onClick={onAuthVerification} className='primaryBtn float-end'>am I authenticated?</Button>
+        </Col>
+      </Row>
+      
+      <Row>
+        <Col>
+          {ctx?.authenticator.token}
         </Col>
       </Row>
       

@@ -12,9 +12,10 @@ export const useAxiosInstance = (baseUrl: string) => {
   })
 
   useEffect(() => {
+    const token = ctx?.authenticator.token
     const requestInterceptor = axiosPrivate.interceptors.request.use(
       (request) => {
-        request.headers['Authorization'] = ctx?.authenticator.token
+        request.headers['Authorization'] = token
         return request
       },
       (error) => {
@@ -27,6 +28,10 @@ export const useAxiosInstance = (baseUrl: string) => {
         return response
       },
       (error) => {
+        if(error.response.status === 401){//when something defined that user is not authenticated
+          ctx?.authenticator.signOut()
+          ctx?.onBasicSignOut('/')
+        }
         return Promise.reject(error)
       }
     )
@@ -35,7 +40,7 @@ export const useAxiosInstance = (baseUrl: string) => {
       axiosPrivate.interceptors.request.eject(requestInterceptor)
       axiosPrivate.interceptors.response.eject(responseInterceptor)
     }
-  }, [ctx, axiosPrivate])
+  }, [axiosPrivate, ctx])
 
   return axiosPrivate
 }
