@@ -1,7 +1,7 @@
 import { AiOutlineUser } from 'react-icons/ai'
 import { Container, NavDropdown, Navbar } from 'react-bootstrap'
 import { FC, useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { authenticationApi } from '../../configurations/settings'
 import { getUserAvatar } from '../../shared/utils/UserHelper'
 import { parseCamelCase } from '../../shared/utils/TextHelper'
@@ -17,10 +17,14 @@ import style from './Header.module.scss'
 const Header: FC = () => {
   const ctx = useContext(SecurityContext)
   const authApiInstance = useAxiosInstance(authenticationApi())
+  const navigate = useNavigate()
 
   const onSignOut = () => {
     signOut(authApiInstance, ctx?.authenticator.currentUser?.email ?? '')
-      .then(() => ctx?.onBasicSignOut('/'))
+      .then(() => {
+        ctx?.onBasicSignOut()
+        navigate('/')
+      })
       .then(() => toast.success('sign out success'))
       .catch((err: Error) => toast.error(parseCatchMessage(err)))
   }

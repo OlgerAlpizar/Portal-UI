@@ -1,6 +1,6 @@
 import { Card, Col, Form, Row } from 'react-bootstrap'
 import { FC, SyntheticEvent, useContext, useReducer, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { authenticationApi } from '../../configurations/settings'
 import { emailValidator, noEmptyValidator } from '../../shared/utils/TextHelper'
 import { parseCatchMessage } from '../../shared/utils/MessageHelper'
@@ -20,6 +20,7 @@ import cx from 'classnames'
 const SignIn: FC = () => {
   const ctx = useContext(SecurityContext)
   const authApiInstance = useAxiosInstance(authenticationApi())
+  const navigate = useNavigate()
 
   const emailReducer = (currentState: InputState, value: string) => {
     return textInputReducer(
@@ -55,7 +56,8 @@ const SignIn: FC = () => {
 
     signIn(authApiInstance, request)
       .then((res: AuthResponse) => {
-        ctx?.onBasicAuth(res, 'Sign in completed', '/')
+        ctx?.onBasicSignIn(res, 'Sign in completed')
+        navigate('/')
       })
       .catch((err: Error) => toast.error(parseCatchMessage(err)))
       .finally(() => setSubmitting(false))

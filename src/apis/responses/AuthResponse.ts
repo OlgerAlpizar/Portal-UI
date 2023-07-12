@@ -1,10 +1,11 @@
 interface AuthResponse {
-  token: string
+  accessToken: string
+  refreshToken: string
+  accessTokenExpiresIn: number
   firstName: string
   lastName: string
   avatar: string
   email: string
-  expiresIn: number
 }
 
 export default AuthResponse

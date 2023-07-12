@@ -10,7 +10,7 @@ import {
   Row,
 } from 'react-bootstrap'
 import { FC, SyntheticEvent, useContext, useReducer, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { authenticationApi } from '../../configurations/settings'
 import {
   conformPasswordValidator,
@@ -35,6 +35,7 @@ import TermsConditions from '../termsConditions/TermsConditions'
 const SignUp: FC = () => {
   const ctx = useContext(SecurityContext)
   const authApiInstance = useAxiosInstance(authenticationApi())
+  const navigate = useNavigate()
 
   const emailReducer = (currentState: InputState, value: string) => {
     return textInputReducer(
@@ -108,7 +109,8 @@ const SignUp: FC = () => {
 
     signUp(authApiInstance, request)
       .then((res: AuthResponse) => {
-        ctx?.onBasicAuth(res, 'The account has been created', '/')
+        ctx?.onBasicSignIn(res, 'The account has been created')
+        navigate('/')
       })
       .catch((err: Error) => toast.error(parseCatchMessage(err)))
       .finally(() => setSubmitting(false))

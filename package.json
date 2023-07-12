@@ -7,7 +7,7 @@
     "start": "webpack serve",
     "build": "webpack --mode production",
     "linter": "eslint --fix . --ext .ts,.tsx",
-    "format": "prettier --write .",
+    "formatter": "prettier --write .",
     "clean": "rimraf src/dist"
   },
   "dependencies": {
@@ -17,8 +17,8 @@
     "js-cookie": "^3.0.5",
     "pubsub-js": "^1.9.4",
     "react": "^18.2.0",
-    "react-auth-kit": "^2.12.3",
     "react-bootstrap": "^2.7.4",
+    "react-cookie": "^4.1.1",
     "react-dom": "^18.2.0",
     "react-icons": "^4.9.0",
     "react-router-dom": "^6.12.0",

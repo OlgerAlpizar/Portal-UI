@@ -1,7 +1,6 @@
 import './bootstrap.scss'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'react-toastify/dist/ReactToastify.css'
-import { AuthProvider } from 'react-auth-kit'
 import { BrowserRouter } from 'react-router-dom'
 import { SecurityContextProvider } from './contexts/SecurityContext'
 import App from './App'
@@ -11,18 +10,11 @@ import Toaster from './shared/components/toaster/Toaster'
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <>
-    <AuthProvider
-      authType={'cookie'}
-      authName={'_auth'}
-      cookieDomain={window.location.hostname}
-      cookieSecure={window.location.protocol === 'https:'}
-    >
+    <SecurityContextProvider>
       <BrowserRouter>
-        <SecurityContextProvider>
-          <App />
-          <Toaster />
-        </SecurityContextProvider>
+        <App />
+        <Toaster />
       </BrowserRouter>
-    </AuthProvider>
+    </SecurityContextProvider>
   </>
 )

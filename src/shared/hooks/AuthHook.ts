@@ -1,59 +1,67 @@
-import { AuthStateUserObject } from 'react-auth-kit/dist/types'
+import { AxiosInstance } from 'axios'
 import { buildUserCookie } from '../utils/UserHelper'
+import { parseCatchMessage } from '../utils/MessageHelper'
+import { refreshSession } from '../../apis/AuthenticationService'
 import { toast } from 'react-toastify'
-import {
-  useAuthHeader,
-  useAuthUser,
-  useIsAuthenticated,
-  useSignIn,
-  useSignOut,
-} from 'react-auth-kit'
 import { useCallback, useEffect, useState } from 'react'
 import AuthResponse from '../../apis/responses/AuthResponse'
+import Cookies from 'js-cookie'
+import User from '../../models/User'
 
-export const useBasicAuth = () => {
+export const useBasicAuth = (api: AxiosInstance) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [currentUser, setCurrentUser] = useState<AuthStateUserObject | null>(null)
-  const [token, setToken] = useState('')
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
+  const [accessToken, setAccessToken] = useState('')
+  const authApiInstance = api
 
-  const onSignIn = useSignIn()
-  const onSignOut = useSignOut()
-  const getToken = useAuthHeader() 
-  const checkAuthenticated = useIsAuthenticated()
-  const getAuthUser = useAuthUser()
-
-  const placeAuthFullState = useCallback(() => {
-    if(!checkAuthenticated() && isAuthenticated){
-      toast.info('Session has been expired, Please log in again')
-    }
-    setToken(getToken())
-    setIsAuthenticated(checkAuthenticated())
-    setCurrentUser(getAuthUser())
-  }, [getToken, checkAuthenticated, getAuthUser, isAuthenticated])
-  
   const signIn = (res: AuthResponse) => {
-    const user = buildUserCookie(res)
-
-    onSignIn({
-      token: res.token,
-      expiresIn: res.expiresIn,
-      tokenType: 'Bearer',
-      authState: user,
-    })
-
-    placeAuthFullState()
+    setAccessToken(res.accessToken)
+    setCurrentUser(buildUserCookie(res))
+    setIsAuthenticated(true)
   }
 
-  const signOut = useCallback(() => {
-    onSignOut()
+  const signOut = () => {
     setIsAuthenticated(false)
     setCurrentUser(null)
-    setToken('')
-  }, [onSignOut])
+    setAccessToken('')
+  }
+
+  const isSigned = (): boolean => {
+    return Cookies.get('signed') ? true : false
+  }
+
+  const refresh = useCallback(() => {
+    refreshSession(authApiInstance)
+      .then((res) => {
+        signIn(res)
+      })
+      .catch((error) => toast.error(parseCatchMessage(error)))
+  }, [authApiInstance])
+
+  const autoCheckIn = useCallback(() => {
+    const check = accessToken !== '' && isAuthenticated && currentUser !== null
+    setIsAuthenticated(check)
+    if (isSigned() && !check) {
+      refresh()
+    }
+  }, [accessToken, currentUser, isAuthenticated, refresh])
+
+  const updateAccessToken = async (newAccessToken: string) => {
+    setAccessToken(newAccessToken)
+  }
 
   useEffect(() => {
-    placeAuthFullState()
-  }, [placeAuthFullState])
+    autoCheckIn()
+  }, [autoCheckIn])
 
-  return { signIn, signOut, isAuthenticated, currentUser, token }
+  return {
+    signIn,
+    signOut,
+    updateAccessToken,
+    isSigned,
+    refresh,
+    isAuthenticated,
+    currentUser,
+    accessToken,
+  }
 }

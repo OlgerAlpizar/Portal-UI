@@ -1,16 +1,16 @@
 import { FC, createContext } from 'react'
+import { authenticationApi } from '../configurations/settings'
 import { toast } from 'react-toastify'
+import { useAxiosInstance } from '../shared/hooks/AxiosHook'
 import { useBasicAuth } from '../shared/hooks/AuthHook'
-import { useLocation, useNavigate } from 'react-router-dom'
 import AuthResponse from '../apis/responses/AuthResponse'
 
 type SecurityContextProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   authenticator: any // as this is a hook, using any is easier than deconstruct the entire object
-  onBasicAuth: (res: AuthResponse, alert: string, redirectPath: string) => void
-  onBasicSignOut: (redirectPath: string) => void
-  onNavigate: (path: string) => void
-  getRouteLocation: () => void
+  onBasicSignIn: (res: AuthResponse, alert: string) => void
+  onBasicSignOut: () => void
+  updateAccessToken: (newAccessToken: string) => void
 }
 
 const SecurityContext = createContext<SecurityContextProps | null>(null)
@@ -22,41 +22,28 @@ type SecurityContextProviderProps = {
 export const SecurityContextProvider: FC<SecurityContextProviderProps> = (
   props: SecurityContextProviderProps
 ) => {
-  const navigator = useNavigate()
-  const locator = useLocation()
-  const authenticator = useBasicAuth()
+  const authenticator = useBasicAuth(useAxiosInstance(authenticationApi()))
 
-  const onBasicAuth = (
-    res: AuthResponse,
-    alert: string,
-    redirectPath: string
-  ) => {
+  const onBasicSignIn = (res: AuthResponse, alert: string) => {
     authenticator.signIn(res)
     toast.success(alert)
-    onNavigate(redirectPath)
   }
 
-  const onBasicSignOut = (redirectPath: string) => {
+  const onBasicSignOut = () => {
     authenticator.signOut()
-    onNavigate(redirectPath)
   }
 
-  const onNavigate = (path: string) => {
-    navigator(path)
-  }
-
-  const getRouteLocation = () => {
-    return locator
+  const updateAccessToken = async (newAccessToken: string) => {
+    await authenticator.updateAccessToken(newAccessToken)
   }
 
   return (
     <SecurityContext.Provider
       value={{
         authenticator: authenticator,
-        onBasicAuth: onBasicAuth,
+        onBasicSignIn: onBasicSignIn,
         onBasicSignOut: onBasicSignOut,
-        onNavigate: onNavigate,
-        getRouteLocation: getRouteLocation,
+        updateAccessToken: updateAccessToken,
       }}
     >
       {props.children}
